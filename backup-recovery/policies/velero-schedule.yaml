@@ -1,0 +1,17 @@
+# Velero Automated Backup Schedule Policy for Kubernetes HA
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: qe-platform-hourly-backup
+  namespace: velero-backup
+spec:
+  schedule: "0 * * * *" # Every hour
+  template:
+    includedNamespaces:
+      - jenkins
+      - argocd
+      - automation-tracker
+      - monitoring
+    snapshotVolumes: true
+    ttl: 168h0m0s # Retain backups for 7 days
+    storageLocation: default

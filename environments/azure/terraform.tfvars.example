@@ -1,0 +1,19 @@
+# Azure Environment Variables for QE Platform
+environment          = "prod-qe"
+azure_region         = "eastus"
+resource_group_name  = "rg-qe-ha-platform"
+vnet_address_space   = "10.10.0.0/16"
+cluster_name         = "qe-ha-aks-cluster"
+kubernetes_version   = "1.30"
+vm_size              = "Standard_D4s_v5"
+node_count           = 3
+min_node_count       = 3
+max_node_count       = 6
+
+# Storage & Backups
+backup_retention_days = 30
+geo_redundant_backup  = true
+
+# Observability
+enable_azure_monitor_metrics = true
+alert_emails                 = ["qe-infra-alerts@company.com"]

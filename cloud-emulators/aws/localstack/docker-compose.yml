@@ -1,0 +1,31 @@
+# LocalStack AWS Emulator Docker Compose
+
+services:
+  localstack:
+    container_name: qe-localstack-aws
+    image: localstack/localstack:3.7.2
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+      - "4510-4559:4510-4559"  # External service port range
+    environment:
+      - SERVICES=s3,iam,sts,sqs,sns,cloudwatch,ec2,eks,dynamodb,secretsmanager
+      - AWS_DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DEBUG=0
+      - PERSISTENCE=1
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./.localstack}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./init-scripts:/etc/localstack/init/ready.d"
+    networks:
+      - qe-platform-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  qe-platform-net:
+    name: qe-platform-network
+    driver: bridge

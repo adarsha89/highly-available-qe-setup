@@ -1,0 +1,135 @@
+# Jenkins Configuration as Code (JCasC)
+# 100% Deterministic state restoration for High Availability Jenkins Controller
+jenkins:
+  systemMessage: "Highly Available Quality Engineering CI/CD Platform - Managed via JCasC"
+  numExecutors: 0 # Controller runs zero builds; all builds spawn dynamically on Kubernetes worker nodes
+  mode: EXCLUSIVE
+  scmCheckoutRetryCount: 3
+
+  # Kubernetes Dynamic Cloud Configuration
+  clouds:
+    - kubernetes:
+        name: "kubernetes"
+        serverUrl: "https://kubernetes.default.svc"
+        namespace: "jenkins"
+        jenkinsUrl: "http://jenkins-service.jenkins.svc.cluster.local:8080"
+        jenkinsTunnel: "jenkins-service.jenkins.svc.cluster.local:50000"
+        containerCapStr: "30"
+        retentionTimeout: 10
+        connectTimeout: 100
+        templates:
+          - name: "qe-dynamic-agent"
+            label: "qe-agent"
+            nodeUsageMode: "NORMAL"
+            workspaceVolume:
+              emptyDirWorkspaceVolume:
+                memory: false
+            serviceAccount: "jenkins-sa"
+            containers:
+              - name: "jnlp"
+                # jdk21 tag required: must match the controller's jenkins/jenkins:lts-jdk21 JRE,
+                # otherwise the agent fails with UnsupportedClassVersionError loading remoting classes.
+                image: "jenkins/inbound-agent:3206.vb_15dcf73f6a_9-1-jdk21"
+                privileged: false
+                alwaysPullImage: false
+                resourceRequestCpu: "500m"
+                resourceLimitCpu: "1000m"
+                resourceRequestMemory: "1024Mi"
+                resourceLimitMemory: "2048Mi"
+              - name: "tools"
+                image: "alpine/k8s:1.30.2" # Contains kubectl, helm, curl, git
+                command: "cat"
+                ttyEnabled: true
+                resourceRequestCpu: "500m"
+                resourceLimitCpu: "2000m"
+                resourceRequestMemory: "1024Mi"
+                resourceLimitMemory: "4096Mi"
+
+  # Security & Role-Based Authorization Matrix
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "${JENKINS_ADMIN_PASSWORD:-admin123}"
+
+security:
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: false
+
+unclassified:
+  location:
+    adminAddress: "qe-admin@company.com"
+    url: "${JENKINS_URL:-http://localhost:8080/}"
+
+  # Prometheus Metrics Plugin Configuration for HA Monitoring
+  prometheusConfiguration:
+    collectDiskUsage: true
+    collectNodeStatus: true
+    path: "prometheus"
+
+jobs:
+  - script: >
+      pipelineJob('qe-platform-pipeline-local') {
+          description('Continuous Integration and HA Verification on Local / Kind / LocalStack')
+          definition {
+              cpsScm {
+                  scm {
+                      git {
+                          remote {
+                              url('https://github.com/adarsha89/highly-available-qe-setup.git')
+                          }
+                          branches('*/main')
+                      }
+                  }
+                  scriptPath('jenkins/pipelines/Jenkinsfile.ha-qe-pipeline')
+              }
+          }
+      }
+
+      pipelineJob('qe-failover-resilience-drill') {
+          description('Automated Chaos & Failover Verification against Kubernetes HA & Jenkins controller')
+          triggers {
+              cron('H H(1-5) * * *')
+          }
+          definition {
+              cps {
+                  script('''
+                      pipeline {
+                          agent { label 'qe-agent' }
+                          stages {
+                              stage('Checkout') {
+                                  steps {
+                                      container('tools') {
+                                          sh 'git clone --depth 1 --branch main https://github.com/adarsha89/highly-available-qe-setup.git .'
+                                      }
+                                  }
+                              }
+                              stage('Pre-flight Health Check') {
+                                  steps {
+                                      container('tools') {
+                                          sh 'kubectl get nodes'
+                                          sh 'curl -f http://qe-monitoring-prometheus.monitoring.svc.cluster.local:9090/-/healthy'
+                                      }
+                                  }
+                              }
+                              stage('Run Resilience Test Suite') {
+                                  steps {
+                                      container('tools') {
+                                          sh 'pip3 install --quiet --break-system-packages pytest requests'
+                                          sh 'pytest tests/failover/ tests/kubernetes-ha/ -v'
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  ''')
+                  sandbox()
+              }
+          }
+      }
+

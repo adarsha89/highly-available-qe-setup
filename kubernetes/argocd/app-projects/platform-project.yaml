@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: qe-platform
+  namespace: argocd
+spec:
+  description: Highly Available Quality Engineering Platform Workloads
+  sourceRepos:
+    - "*"
+  destinations:
+    - namespace: jenkins
+      server: https://kubernetes.default.svc
+    - namespace: automation-tracker
+      server: https://kubernetes.default.svc
+    - namespace: monitoring
+      server: https://kubernetes.default.svc
+    - namespace: velero-backup
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

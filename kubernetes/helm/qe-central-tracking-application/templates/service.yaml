@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-backend-svc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: tracker-backend
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: tracker-backend
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-frontend-svc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: tracker-frontend
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: tracker-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80

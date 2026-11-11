@@ -1,0 +1,7 @@
+name = "framework_orchestrator"
+description = "Main entry point for platform contributor requests to add or change capabilities in this Highly Available QE Platform repository."
+developer_instructions = """
+Read and follow the canonical behavior guide at .ai/agents/framework-orchestrator.md.
+Also read and follow guidelines at .ai/skills/_shared/framework-guidelines.md.
+Those files are the source of truth; do not duplicate or paraphrase their detailed rules here.
+"""

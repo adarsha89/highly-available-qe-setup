@@ -1,0 +1,7 @@
+name = "planning_agent"
+description = "Turns platform requirements into file-level implementation plans."
+developer_instructions = """
+Read and follow the canonical behavior guide at .ai/agents/planning-agent.md.
+Also read and follow the plan-framework-code-changes skill at .ai/skills/plan-framework-code-changes/SKILL.md.
+Those files are the source of truth; do not duplicate or paraphrase their detailed rules here.
+"""

@@ -1,0 +1,167 @@
+QUALITY GATES CATALOG
+(Manual + Automated gates to be tracked by the QE Central Tracking Application)
+
+Each gate should be tracked with: gate name | type (manual/automated) | stage (pre-commit/PR/CI/pre-release/post-release) | pass criteria/threshold | owner
+
+================================================================
+1. UI - WEB
+================================================================
+Manual gates:
+- Exploratory testing sign-off (per release/feature)
+- Cross-browser visual review (Chrome/Firefox/Safari/Edge)
+- Accessibility manual audit (WCAG 2.1/2.2 AA checklist)
+- UX/usability review
+- Content, copy, and localization/i18n review
+- Design-to-build (Figma/spec) parity review
+
+Automated gates:
+- Unit/component test coverage threshold (e.g. >=80%)
+- E2E test suite pass (Playwright/Cypress/Selenium)
+- Visual regression testing (pixel/DOM diff, e.g. Percy/Chromatic)
+- Automated accessibility scan (axe-core/pa11y)
+- Cross-browser automated matrix pass (BrowserStack/Sauce Labs)
+- Performance budget gate (Lighthouse score, Core Web Vitals: LCP/CLS/INP)
+- Static analysis/linting pass (ESLint, Stylelint)
+- Console error / broken link / dead resource check
+- Bundle size budget gate
+
+================================================================
+2. UI - MOBILE (iOS/Android)
+================================================================
+Manual gates:
+- Device-specific exploratory testing sign-off
+- App Store / Play Store compliance review
+- Manual gesture, orientation, and interrupt testing (calls, notifications)
+- Offline mode / poor-connectivity manual verification
+- Push notification manual verification
+- Accessibility manual audit (VoiceOver/TalkBack)
+
+Automated gates:
+- Automated UI test suite pass (Appium/Espresso/XCUITest/Detox)
+- Device farm matrix pass (Firebase Test Lab/BrowserStack App Automate)
+- Crash-free session rate threshold (e.g. >=99.5%)
+- App startup time / app size budget gate
+- Automated accessibility checks
+- Build signing, provisioning, and release pipeline validation
+- Battery/memory usage regression check
+
+================================================================
+3. API
+================================================================
+Manual gates:
+- API contract/spec review (OpenAPI/Swagger peer review)
+- Exploratory and manual security testing touchpoints
+- Error-handling / response message review
+- Manual UAT sign-off for business-critical endpoints
+
+Automated gates:
+- Contract testing / schema validation (Pact, JSON Schema)
+- Functional test suite pass (positive, negative, boundary, edge cases)
+- Integration test suite pass (cross-service)
+- Security scan gate (SAST/DAST, OWASP ZAP, dependency vuln scan)
+- AuthN/AuthZ and rate-limiting automated tests
+- Backward-compatibility / breaking-change detection gate
+- Response time / latency SLA gate (p50/p95/p99)
+- Service virtualization / mock validation
+- Idempotency and retry-safety checks (critical for payment/ledger APIs)
+
+================================================================
+4. DATABASE
+================================================================
+Manual gates:
+- Schema/migration peer review
+- Data model review
+- Manual data-integrity spot checks
+- Backup/restore and DR drill sign-off
+- Transaction ledger / reconciliation manual audit (fintech-specific)
+
+Automated gates:
+- Migration test automation (up/down, idempotent re-run)
+- Data validation queries (row counts, referential integrity, orphan checks)
+- Query performance regression gate (explain-plan/execution-time thresholds)
+- Automated backup verification/restore test
+- Data masking / PII & compliance checks (GDPR, PCI-DSS)
+- Replication lag monitoring gate
+- Double-entry ledger balance/reconciliation automated check (invoice discounting, factoring accuracy)
+
+================================================================
+5. PERFORMANCE
+================================================================
+Manual gates:
+- Capacity planning review
+- Manual exploratory load/soak observation
+- Performance sign-off review with stakeholders
+
+Automated gates:
+- Load testing gate (JMeter/Locust/k6/Gatling) vs. defined threshold
+- Stress, soak, and spike test pass
+- Throughput and response-time SLA gate
+- Resource utilization thresholds (CPU/memory/connections)
+- Performance budget enforced in CI (API latency, page load, web vitals)
+- Scalability/autoscaling validation test
+- Performance regression trend gate (vs. historical baseline)
+
+================================================================
+6. AI AUTOMATION / AI-NATIVE QUALITY ENGINEERING
+================================================================
+Manual gates:
+- Human-in-the-loop review of AI-generated code/PRs before merge
+- Manual prompt/response review for edge cases and ambiguous outputs
+- Bias/fairness manual audit
+- Red-teaming / adversarial manual testing
+
+Automated gates:
+- LLM evaluation pipeline gate (golden-dataset accuracy, hallucination rate)
+- Automated regression on prompt/response pairs (eval suite pass %)
+- AI-generated code coverage/test gate (same bar as human-written code)
+- Model output schema/format validation gate
+- Automated guardrail/safety checks (toxicity, PII leakage, jailbreak resistance)
+- Model/data drift detection monitoring gate
+- AI-assisted test-generation coverage gate (does generated test suite meet coverage target)
+- Cost and latency budget gate for AI/LLM calls
+- Prompt-injection and output-sanitization automated checks
+
+================================================================
+7. CROSS-CUTTING RELEASE / MERGE GATES
+================================================================
+- Code review approval (required reviewers)
+- Static code analysis / linting pass (all languages)
+- Unit test coverage threshold (global)
+- Security scan pass (SAST/DAST/dependency/secret scanning)
+- Full CI/CD pipeline gate (all above checks green before merge to main)
+- Regression suite pass (smoke + full regression by release tier)
+- UAT / business sign-off
+- Change management & compliance approval (SOC2/PCI/regulatory, fintech-specific)
+- Flakiness threshold gate (quarantine tests exceeding flake rate)
+- Defect escape rate / production defect density threshold
+
+================================================================
+8. FUNCTIONAL TEST COVERAGE METRICS
+================================================================
+- Requirement/user-story coverage: requirements mapped to test cases / total requirements
+- Test case automation coverage: automated test cases / total test cases
+- Code coverage: line/branch/function coverage from automated test execution (unit + integration + E2E)
+- API endpoint coverage: endpoints with automated tests / total endpoints
+- UI screen/flow coverage: screens or user flows covered / total screens or flows
+- Risk-based coverage: critical/high-risk areas covered / total critical areas
+- Regression suite coverage: regression-tagged test cases executed / total regression suite
+
+================================================================
+9. DEFECT DETECTION & QUALITY METRICS
+================================================================
+- Defect Detection Efficiency (DDE): defects found before release / (defects found before release + defects found after release)
+- Automation DDE: automation-detected defects / all identified defects
+- Production Defect Leakage: production defects / all identified defects
+- Critical Defect Detection: critical defects detected before release / total critical defects
+- Defect Detection Time: time between defect introduction and detection
+- Flaky Test Rate: flaky executions / total executions
+
+================================================================
+TRACKING FIELDS (for app schema)
+================================================================
+Per gate, capture: gate_id, category (UI-Web/UI-Mobile/API/DB/Performance/AI), type (manual/automated),
+pipeline_stage, pass_threshold, actual_result, status (pass/fail/waived), owner, linked_execution_id,
+defect_ids_raised, timestamp.
+
+Per metric (coverage + defect detection), capture: metric_id, metric_name, category, numerator, denominator,
+computed_value, target_threshold, release/build_id, timestamp.

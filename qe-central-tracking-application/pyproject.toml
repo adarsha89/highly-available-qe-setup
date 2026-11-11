@@ -1,0 +1,25 @@
+[project]
+name = "qe-central-tracking-application"
+version = "1.0.0"
+description = "Central tracking and analysis application for automation data and quality metrics"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi==0.115.0",
+    "uvicorn[standard]==0.30.6",
+    "sqlalchemy==2.0.35",
+    "pydantic==2.9.2",
+    "ollama==0.6.3",
+    "prometheus-client==0.21.0",
+]
+
+[project.optional-dependencies]
+# Only needed if AI_PROVIDER=anthropic or AI_PROVIDER=openai is set for /api/ai/insights.
+# ollama is installed by default since it's the default AI provider; the app still falls
+# back to the built-in rule-based provider if no Ollama server is reachable.
+ai = [
+    "anthropic==0.39.0",
+    "openai==1.54.0",
+]
+
+[tool.uv]
+package = false

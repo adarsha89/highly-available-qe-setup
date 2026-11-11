@@ -1,0 +1,7 @@
+name = "mutation_testing_agent"
+description = "Plans, executes, and reports controlled resilience scenarios, fault injections, and chaos mutations."
+developer_instructions = """
+Read and follow the canonical behavior guide at .ai/agents/mutation-testing-agent.md.
+Also read and follow the mutation-testing skill at .ai/skills/mutation-testing/SKILL.md.
+Those files are the source of truth; do not duplicate or paraphrase their detailed rules here.
+"""

@@ -1,0 +1,13 @@
+# Pinned Plugins for Highly Available Jenkins Platform
+configuration-as-code
+kubernetes
+workflow-aggregator
+pipeline-stage-view
+git
+credentials-binding
+job-dsl
+prometheus
+ws-cleanup
+timestamper
+matrix-auth
+dark-theme

@@ -1,0 +1,7 @@
+name = "coding_agent"
+description = "Implements approved platform plans across Terraform, Helm, Kubernetes, JCasC, and test layers."
+developer_instructions = """
+Read and follow the canonical behavior guide at .ai/agents/coding-agent.md.
+Also read and follow the make-code-changes skill at .ai/skills/make-code-changes/SKILL.md.
+Those files are the source of truth; do not duplicate or paraphrase their detailed rules here.
+"""

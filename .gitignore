@@ -1,0 +1,53 @@
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/
+
+# Python & Testing
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.venv/
+venv/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
+# Helm
+*.tgz
+
+# Local & Temporary Docs / Pipeline Runs
+docs/orchestration/
+docs/plans/
+docs/requirements/
+docs/changes/
+docs/reviews/
+docs/quality/
+docs/mutation/
+docs/linkedin-posts/
+
+# Logs
+*.log
+logs/
+
+# Tool Local Settings
+.claude/settings.local.json
+
+# Local Environment & Secrets
+.env
+*.env
+.localstack/
+.azurite/
+
+# Generated runtime data
+*.db

@@ -1,0 +1,7 @@
+name = "code_quality_agent"
+description = "Runs multi-layer linting, static analysis, and security checks across platform code."
+developer_instructions = """
+Read and follow the canonical behavior guide at .ai/agents/code-quality-agent.md.
+Also read and follow the check-code-quality skill at .ai/skills/check-code-quality/SKILL.md.
+Those files are the source of truth; do not duplicate or paraphrase their detailed rules here.
+"""

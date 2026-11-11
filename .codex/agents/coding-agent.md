@@ -1,0 +1,1 @@
+../../.ai/agents/coding-agent.md

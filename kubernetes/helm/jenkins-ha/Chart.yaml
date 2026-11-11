@@ -1,0 +1,11 @@
+apiVersion: v2
+name: jenkins-ha
+description: Highly Available Jenkins Controller with JCasC and Dynamic Kubernetes Agent Scaling
+type: application
+version: 1.0.0
+appVersion: "2.462.1"
+keywords:
+  - jenkins
+  - ci-cd
+  - high-availability
+  - jcasc

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QE Central Tracking</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>QE Central Tracking</h1>
+    <div class="filters">
+      <label>Category
+        <select id="categoryFilter">
+          <option value="">All</option>
+          <option value="api">API</option>
+          <option value="web">Web</option>
+          <option value="mobile">Mobile</option>
+          <option value="database">Database</option>
+          <option value="performance">Performance</option>
+          <option value="ai">AI</option>
+        </select>
+      </label>
+      <label>Build ID
+        <input id="buildFilter" type="text" placeholder="e.g. build-1042" />
+      </label>
+      <button id="applyFilters">Apply</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="overview">Overview</button>
+    <button class="tab-btn" data-tab="executions">Executions</button>
+    <button class="tab-btn" data-tab="deployments">Deployments</button>
+    <button class="tab-btn" data-tab="defects">Defects</button>
+    <button class="tab-btn" data-tab="flakiness">Flakiness</button>
+    <button class="tab-btn" data-tab="gates">Quality Gates</button>
+    <button class="tab-btn" data-tab="coverage">Coverage</button>
+    <button class="tab-btn" data-tab="ai">AI Insights</button>
+  </nav>
+
+  <main>
+    <section id="tab-overview" class="tab-panel active">
+      <div id="overviewCards" class="card-grid"></div>
+      <div id="deploymentSummary" class="card"></div>
+    </section>
+
+    <section id="tab-executions" class="tab-panel">
+      <table id="executionsTable" class="data-table">
+        <thead>
+          <tr><th>Category</th><th>Suite</th><th>Env</th><th>Build</th><th>Status</th><th>Pass/Total</th><th>Started</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="tab-deployments" class="tab-panel">
+      <table id="deploymentsTable" class="data-table">
+        <thead>
+          <tr><th>Service</th><th>Env</th><th>Category</th><th>Status</th><th>Duration (s)</th><th>Started</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="tab-defects" class="tab-panel">
+      <table id="defectsTable" class="data-table">
+        <thead>
+          <tr><th>Category</th><th>Title</th><th>Priority</th><th>Status</th><th>Detected By</th><th>Phase</th><th>Detected At</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="tab-flakiness" class="tab-panel">
+      <table id="flakinessTable" class="data-table">
+        <thead>
+          <tr><th>Test Case</th><th>Category</th><th>Total Runs</th><th>Flaky Runs</th><th>Flaky Rate %</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="tab-gates" class="tab-panel">
+      <table id="gatesTable" class="data-table">
+        <thead>
+          <tr><th>Category</th><th>Gate</th><th>Type</th><th>Stage</th><th>Status</th><th>Owner</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="tab-coverage" class="tab-panel">
+      <table id="coverageTable" class="data-table">
+        <thead>
+          <tr><th>Category</th><th>Metric</th><th>Numerator</th><th>Denominator</th><th>Coverage %</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="tab-ai" class="tab-panel">
+      <button id="generateInsights">Generate AI Insights</button>
+      <span id="aiProviderBadge" class="badge"></span>
+      <div id="aiSummary" class="card"></div>
+      <ul id="aiRecommendations" class="recommendation-list"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jenkins-ha
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: qe-platform
+spec:
+  project: qe-platform
+  source:
+    repoURL: "https://github.com/adarsha89/highly-available-qe-setup.git"
+    targetRevision: HEAD
+    path: kubernetes/helm/jenkins-ha
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jenkins
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true # Automatically reconciles any drift
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

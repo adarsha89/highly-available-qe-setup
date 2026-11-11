@@ -1,0 +1,7 @@
+name = "code_review_agent"
+description = "Reviews platform change manifests against HA standards, security, and idempotency with 10 parameter scores."
+developer_instructions = """
+Read and follow the canonical behavior guide at .ai/agents/code-review-agent.md.
+Also read and follow the review-code-changes skill at .ai/skills/review-code-changes/SKILL.md.
+Those files are the source of truth; do not duplicate or paraphrase their detailed rules here.
+"""

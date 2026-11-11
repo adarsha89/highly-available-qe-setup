@@ -1,0 +1,55 @@
+# Pod Disruption Budgets (PDB) Ensuring High Availability during Upgrades & Node Drains
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: jenkins-pdb
+  namespace: jenkins
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jenkins
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: tracker-backend-pdb
+  namespace: automation-tracker
+spec:
+  minAvailable: 2 # At least 2 backend replicas must always remain online
+  selector:
+    matchLabels:
+      app: tracker-backend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: tracker-frontend-pdb
+  namespace: automation-tracker
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: tracker-frontend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: argocd-server-pdb
+  namespace: argocd
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-server
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: prometheus-pdb
+  namespace: monitoring
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: prometheus

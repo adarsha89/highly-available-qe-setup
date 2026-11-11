@@ -1,0 +1,24 @@
+# Azure Local Emulator (Azurite & Mock Services)
+
+services:
+  azurite:
+    container_name: qe-azurite-azure
+    image: mcr.microsoft.com/azure-storage/azurite:3.31.0
+    ports:
+      - "10000:10000"  # Blob Service
+      - "10001:10001"  # Queue Service
+      - "10002:10002"  # Table Service
+    volumes:
+      - "${AZURITE_VOLUME_DIR:-./.azurite}:/data"
+    networks:
+      - qe-platform-net
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "10000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  qe-platform-net:
+    name: qe-platform-network
+    driver: bridge

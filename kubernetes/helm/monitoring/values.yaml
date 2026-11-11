@@ -1,0 +1,27 @@
+prometheus:
+  name: qe-monitoring-prometheus
+  image: "prom/prometheus:v2.54.0"
+  port: 9090
+  retention: "15d"
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1024Mi"
+
+alertmanager:
+  name: qe-monitoring-alertmanager
+  image: "prom/alertmanager:v0.27.0"
+  port: 9093
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+
+serviceAccount:
+  name: qe-monitoring-sa

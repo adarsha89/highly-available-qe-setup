@@ -1,0 +1,40 @@
+# Standard Namespaces for Highly Available QE Platform
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jenkins
+  labels:
+    platform: qe-ha
+    component: ci-cd
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+  labels:
+    platform: qe-ha
+    component: gitops
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+  labels:
+    platform: qe-ha
+    component: observability
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: automation-tracker
+  labels:
+    platform: qe-ha
+    component: telemetry
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: velero-backup
+  labels:
+    platform: qe-ha
+    component: disaster-recovery

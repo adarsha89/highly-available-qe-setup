@@ -1,0 +1,129 @@
+services:
+  # 1. AWS LocalStack Emulator
+  localstack:
+    container_name: qe-localstack-aws
+    image: localstack/localstack:3.7.2
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3,iam,sts,sqs,sns,cloudwatch,ec2,eks,dynamodb,secretsmanager
+      - AWS_DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "../../cloud-emulators/aws/localstack/init-scripts:/etc/localstack/init/ready.d"
+    networks:
+      - qe-platform-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Azure Local Emulator (Azurite)
+  azurite:
+    container_name: qe-azurite-azure
+    image: mcr.microsoft.com/azure-storage/azurite:3.31.0
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    networks:
+      - qe-platform-net
+
+  # 3. Central QE Tracking API (Backend)
+  tracker-backend:
+    container_name: qe-tracker-backend
+    build:
+      context: ../../qe-central-tracking-application/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=local
+      - DATABASE_URL=sqlite:///./tracker.db
+      - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - PROMETHEUS_METRICS=true
+    depends_on:
+      localstack:
+        condition: service_healthy
+    networks:
+      - qe-platform-net
+
+  # 4. Central QE Tracking Dashboard (Frontend)
+  tracker-frontend:
+    container_name: qe-tracker-frontend
+    build:
+      context: ../../qe-central-tracking-application/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - tracker-backend
+    networks:
+      - qe-platform-net
+
+  # 5. Prometheus Metrics Engine
+  prometheus:
+    container_name: qe-monitoring-prometheus
+    image: prom/prometheus:v2.54.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - "../../monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro"
+      - "../../monitoring/prometheus/alert-rules.yaml:/etc/prometheus/alert-rules.yaml:ro"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    networks:
+      - qe-platform-net
+
+  # 6. Alertmanager Alert Router & Dispatcher
+  alertmanager:
+    container_name: qe-monitoring-alertmanager
+    image: prom/alertmanager:v0.27.0
+    ports:
+      - "9093:9093"
+    volumes:
+      - "../../monitoring/alertmanager/alertmanager.yaml:/etc/alertmanager/alertmanager.yml:ro"
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    networks:
+      - qe-platform-net
+
+  # 7. Grafana Visualization & Observability Dashboards
+  grafana:
+    container_name: qe-monitoring-grafana
+    image: grafana/grafana:11.1.0
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - "../../monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro"
+      - "../../monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro"
+    depends_on:
+      - prometheus
+    networks:
+      - qe-platform-net
+
+  # 8. Loki Centralized Log Storage
+  loki:
+    container_name: qe-monitoring-loki
+    image: grafana/loki:3.1.0
+    ports:
+      - "3100:3100"
+    volumes:
+      - "../../monitoring/loki/loki-config.yaml:/etc/loki/local-config.yaml:ro"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - qe-platform-net
+
+networks:
+  qe-platform-net:
+    name: qe-platform-network
+    driver: bridge

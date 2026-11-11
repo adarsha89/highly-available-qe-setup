@@ -1,0 +1,67 @@
+controller:
+  image: "jenkins/jenkins:lts-jdk21"
+  replicaCount: 1 # Active controller with automatic fast failover / rescheduling
+  serviceType: ClusterIP
+  httpPort: 8080
+  agentPort: 50000
+  # Public URL Jenkins is actually reached at (e.g. via `kubectl port-forward`).
+  # Must match the real external URL or Jenkins flags a "reverse proxy broken" warning.
+  jenkinsUrl: "http://localhost:8080/"
+
+  resources:
+    requests:
+      cpu: "1000m"
+      memory: "2048Mi"
+    limits:
+      cpu: "2000m"
+      memory: "4096Mi"
+
+  javaOpts: "-Djenkins.install.runSetupWizard=false -XX:+UseG1GC"
+
+  # Health Probes for Auto-Recovery & Rescheduling
+  probes:
+    liveness:
+      path: "/login"
+      initialDelaySeconds: 90
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 5
+    readiness:
+      path: "/login"
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+  # High Availability Scheduling & Anti-Affinity
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values: ["jenkins"]
+            topologyKey: "kubernetes.io/hostname"
+
+  # Persistence with HA StorageClass
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    size: "20Gi"
+    accessMode: "ReadWriteOnce"
+
+  # JCasC Configuration Reloading
+  jcasc:
+    enabled: true
+    defaultConfig: true
+
+serviceAccount:
+  create: true
+  name: jenkins-sa
+
+pdb:
+  enabled: true
+  minAvailable: 1

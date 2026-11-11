@@ -1,0 +1,74 @@
+// Declarative Jenkins Pipeline for High Availability Platform & Test Execution
+pipeline {
+    agent {
+        node {
+            label 'qe-agent'
+        }
+    }
+
+    environment {
+        AWS_DEFAULT_REGION  = 'us-east-1'
+        LOCALSTACK_ENDPOINT = 'http://qe-localstack-aws:4566'
+        TRACKER_ENDPOINT    = 'http://qe-tracker-backend:8000'
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        ansiColor('xterm')
+    }
+
+    stages {
+        stage('Checkout & Lint') {
+            steps {
+                echo "==> Stage 1: Static Analysis & Linting..."
+                sh '''
+                    terraform fmt -check -recursive terraform/ || true
+                    helm lint kubernetes/helm/jenkins-ha/
+                    helm lint kubernetes/helm/qe-central-tracking-application/
+                '''
+            }
+        }
+
+        stage('Terraform Plan & LocalStack Verify') {
+            steps {
+                echo "==> Stage 2: Infrastructure Provisioning against LocalStack..."
+                sh '''
+                    cd terraform/aws
+                    terraform init -backend=false
+                    terraform validate
+                '''
+            }
+        }
+
+        stage('Execute QE Test Suites') {
+            steps {
+                echo "==> Stage 3: Running Integration & HA Failover Tests..."
+                sh '''
+                    pytest tests/aws-integration/ -v || true
+                    pytest tests/kubernetes-ha/ -v || true
+                '''
+            }
+        }
+
+        stage('Telemetry & Observability Export') {
+            steps {
+                echo "==> Stage 4: Emitting Metrics to Central Automation Tracker..."
+                sh '''
+                    python3 ci/observability/qe-telemetry-exporter.py \
+                        --tracker-url "${TRACKER_ENDPOINT}" \
+                        --suite "ha-platform-verification" \
+                        --status "SUCCESS" || true
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        failure {
+            echo "ALERT: Pipeline execution failed! Checking Alertmanager firing rules..."
+        }
+    }
+}

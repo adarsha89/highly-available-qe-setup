@@ -1,0 +1,58 @@
+# Network Policies for Namespace Isolation and Secure Intra-Cluster Communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring-scraping
+  namespace: jenkins
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: jenkins
+  ingress:
+    # Uses the automatic, immutable kubernetes.io/metadata.name label (present on every
+    # namespace since Kubernetes 1.22) rather than a hand-applied "name" label, which the
+    # monitoring namespace never had -- that mismatch silently blocked Prometheus scraping.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Dynamic Kubernetes agent pods (jnlp containers) live in this same namespace
+    # and must reach the controller on the HTTP (8080) and JNLP tunnel (50000) ports
+    # to register; without this rule the policy's default-deny blocks agent connect.
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 50000
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-tracker-ingress
+  namespace: automation-tracker
+spec:
+  podSelector:
+    matchLabels:
+      app: tracker-backend
+  ingress:
+    # See allow-monitoring-scraping above: the jenkins namespace has no hand-applied
+    # "name" label either, so this must match on kubernetes.io/metadata.name instead.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: jenkins
+        - podSelector:
+            matchLabels:
+              app: tracker-frontend
+      ports:
+        - protocol: TCP
+          port: 8000
+  policyTypes:
+    - Ingress

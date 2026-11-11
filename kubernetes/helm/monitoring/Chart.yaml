@@ -1,0 +1,11 @@
+apiVersion: v2
+name: monitoring
+description: In-cluster Prometheus & Alertmanager for the Highly Available QE Platform
+type: application
+version: 1.0.0
+appVersion: "v2.54.0"
+keywords:
+  - prometheus
+  - alertmanager
+  - monitoring
+  - high-availability

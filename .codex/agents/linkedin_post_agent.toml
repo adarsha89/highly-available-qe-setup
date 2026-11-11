@@ -1,0 +1,7 @@
+name = "linkedin_post_agent"
+description = "Drafts evidence-backed LinkedIn learning posts grounded in repo engineering decisions."
+developer_instructions = """
+Read and follow the canonical behavior guide at .ai/agents/linkedin-post-agent.md.
+Also read and follow the write-repo-learning-post skill at .ai/skills/write-repo-learning-post/SKILL.md.
+Those files are the source of truth; do not duplicate or paraphrase their detailed rules here.
+"""

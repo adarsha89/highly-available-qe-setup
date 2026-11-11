@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: automation-tracker
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: qe-platform
+spec:
+  project: qe-platform
+  source:
+    repoURL: "https://github.com/adarsha89/highly-available-qe-setup.git"
+    targetRevision: HEAD
+    path: kubernetes/helm/qe-central-tracking-application
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: automation-tracker
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,71 @@
+Highly Available QE Setup Repo (Should cover AWS, Microsoft Azure, In Docker on local):
+
+Following are my reqs for a highly available QA setup:
+1. Highly available kubernetes cluster (Should ideally never go down or should be backed up as soon as it goes down).
+2. Highly Available central automation tracking service.
+3. Highly available Jenkins server with required configurations and Jobs(should ideally never go down or should be backed up as soon as it goes down).
+4. Use ArgoCD, Terraform and HelmCharts if needed for this.
+5. Relevant alerting mechanisms should be in place in case Kube cluster or Jenkins goes down.
+6. For Testing changes for AWS and Microsoft Azure use LocalStack
+7. In Localstack Use Terraform for infrastructure provisioning, Helm for Kubernetes application packaging, and ArgoCD for continuous deployment and reconciliation.
+
+
+highly-available-qe-setup/
+│
+├── environments/
+│   ├── local/
+│   ├── aws/
+│   └── azure/
+│
+├── cloud-emulators/
+│   ├── aws/
+│   │   └── localstack/
+│   └── azure/
+│       └── localstack-azure/
+│
+├── terraform/
+│   ├── modules/
+│   │   ├── kubernetes/
+│   │   ├── networking/
+│   │   ├── storage/
+│   │   ├── iam/
+│   │   └── monitoring/
+│   │
+│   ├── aws/
+│   └── azure/
+│
+├── kubernetes/
+│   ├── kind/
+│   ├── namespaces/
+│   ├── policies/
+│   ├── helm/
+│   └── argocd/
+│
+├── jenkins/
+│   ├── casc/
+│   ├── jobs/
+│   ├── plugins/
+│   └── pipelines/
+│
+├── qe-central-tracking-application/
+│   ├── backend/
+│   ├── frontend/
+│   └── tests/
+│
+├── monitoring/
+│   ├── prometheus/
+│   ├── grafana/
+│   ├── alertmanager/
+│   └── loki/
+│
+├── backup-recovery/
+│   ├── scripts/
+│   ├── policies/
+│   └── restore-tests/
+│
+└── tests/
+    ├── aws-integration/
+    ├── azure-integration/
+    ├── kubernetes-ha/
+    ├── failover/
+    └── disaster-recovery/

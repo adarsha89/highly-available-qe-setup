@@ -1,0 +1,47 @@
+# Multi-Node High Availability Kind Cluster Configuration
+# 3 Control-Plane nodes (etcd HA quorum) + 3 Worker nodes
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: qe-ha-cluster
+networking:
+  ipFamily: ipv4
+  apiServerAddress: "127.0.0.1"
+  apiServerPort: 6443
+
+nodes:
+  # HA Control Plane Nodes (3 nodes for etcd quorum)
+  - role: control-plane
+    labels:
+      ingress-ready: "true"
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+      - containerPort: 8080
+        hostPort: 8080 # Jenkins Web UI
+        protocol: TCP
+      - containerPort: 50000
+        hostPort: 50000 # Jenkins Agent JNLP Port
+        protocol: TCP
+
+  - role: control-plane
+  - role: control-plane
+
+  # Replicated Worker Nodes across logical zones
+  - role: worker
+    labels:
+      topology.kubernetes.io/zone: zone-a
+      role: worker
+
+  - role: worker
+    labels:
+      topology.kubernetes.io/zone: zone-b
+      role: worker
+
+  - role: worker
+    labels:
+      topology.kubernetes.io/zone: zone-c
+      role: worker

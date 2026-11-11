@@ -1,0 +1,7 @@
+name = "task_analysis_agent"
+description = "Turns raw platform change requests into explicit, testable requirements."
+developer_instructions = """
+Read and follow the canonical behavior guide at .ai/agents/task-analysis-agent.md.
+Also read and follow the analyze-task skill at .ai/skills/analyze-task/SKILL.md.
+Those files are the source of truth; do not duplicate or paraphrase their detailed rules here.
+"""

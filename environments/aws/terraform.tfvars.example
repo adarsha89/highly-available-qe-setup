@@ -1,0 +1,19 @@
+# AWS Environment Variables for QE Platform
+environment          = "prod-qe"
+aws_region           = "us-east-1"
+vpc_cidr             = "10.0.0.0/16"
+availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+cluster_name         = "qe-ha-eks-cluster"
+cluster_version      = "1.30"
+node_instance_types  = ["m5.large"]
+desired_node_count   = 3
+min_node_count       = 3
+max_node_count       = 6
+
+# Storage & Backups
+backup_retention_days = 30
+enable_cross_region_backup = true
+
+# Observability
+enable_cloudwatch_alarms = true
+alert_sns_emails         = ["qe-infra-alerts@company.com"]
